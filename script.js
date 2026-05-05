@@ -64,10 +64,40 @@ class GenderizeResponseBody {
         this.gender = obj.gender;
     }
 }
+class DiceBearAdapter {
+    baseUrl = "https://api.dicebear.com/9.x/adventurer/svg?";
+    getAvatarUrl(seed) {
+        let url = `${this.baseUrl}seed=${seed}`;
+        return url;
+    }
+}
+class LoremIpsumAdapter {
+    baseUrl = "https://api.api-ninjas.com/v1/loremipsum";
+    getText(seed) {
+        return fetch(this.baseUrl, {
+            headers: {
+                "X-Api-Key": "YbAFdWgbd1EHAepF2TSRcdUjV075pdVcGToX1EI7"
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            const resp = new LoremResponseBody(json);
+            return resp.text;
+        });
+    }
+}
+class LoremResponseBody {
+    text;
+    constructor(obj) {
+        this.text = obj.text;
+    }
+}
 let api = new RandommerAdapted();
 api.getRandomName().then(function (value) {
-    let a = new GenderizeAdapter();
-    a.getGender(value).then(function (value) {
+    let diceBearAdapter = new DiceBearAdapter();
+    console.log(diceBearAdapter.getAvatarUrl(value));
+    let loremIpumAdapter = new LoremIpsumAdapter();
+    loremIpumAdapter.getText(value).then(function (value) {
         console.log(value);
     });
 });

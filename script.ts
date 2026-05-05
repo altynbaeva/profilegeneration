@@ -69,14 +69,50 @@ class GenderizeResponseBody {
     }
 }
 
+class DiceBearAdapter {
+    private baseUrl = "https://api.dicebear.com/9.x/adventurer/svg?"
+
+    public getAvatarUrl(seed: string): string {
+        let url = `${this.baseUrl}seed=${seed}`
+        return url;
+    }
+}
+
+class LoremIpsumAdapter {
+    private baseUrl = "https://api.api-ninjas.com/v1/loremipsum"
+
+    public getText(seed: string): Promise<string> {
+        return fetch(this.baseUrl, {
+            headers: {
+            "X-Api-Key": "YbAFdWgbd1EHAepF2TSRcdUjV075pdVcGToX1EI7"
+            }
+        }).then(function(response: Response) {
+            return response.json();
+        }).then(function(json: any) {
+            const resp = new LoremResponseBody(json);
+            return resp.text;
+        })
+    }
+}
+
+class LoremResponseBody {
+    public text: string;
+    constructor (obj: any) {
+        this.text = obj.text;
+    }
+}
+
 
 let api = new RandommerAdapted();
 api.getRandomName().then(function(value) {
-    let a = new GenderizeAdapter();
-    a.getGender(value).then(function(value) {
-        console.log(value)
+    let diceBearAdapter = new DiceBearAdapter();
+    console.log(diceBearAdapter.getAvatarUrl(value));
+    let loremIpumAdapter = new LoremIpsumAdapter();
+    loremIpumAdapter.getText(value).then(function(value) {
+        console.log(value);
     })
 })
+
 api.getRandomPhoneNumber().then(function(value) {
     console.log(value);
 })
