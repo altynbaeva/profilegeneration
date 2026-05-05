@@ -1,4 +1,4 @@
-class RandommerAdapted {
+class RandommerAdapter {
     private baseUrl = "https://randommer.io/api"
 
     public getRandomName(): Promise<string> {
@@ -103,7 +103,7 @@ class LoremResponseBody {
 }
 
 
-let api = new RandommerAdapted();
+let api = new RandommerAdapter();
 api.getRandomName().then(function(value) {
     let diceBearAdapter = new DiceBearAdapter();
     console.log(diceBearAdapter.getAvatarUrl(value));
