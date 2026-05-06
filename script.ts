@@ -81,7 +81,7 @@ class DiceBearAdapter {
 class LoremIpsumAdapter {
     private baseUrl = "https://api.api-ninjas.com/v1/loremipsum"
 
-    public getText(seed: string): Promise<string> {
+    public getText(): Promise<string> {
         return fetch(this.baseUrl, {
             headers: {
             "X-Api-Key": "YbAFdWgbd1EHAepF2TSRcdUjV075pdVcGToX1EI7"
@@ -102,17 +102,50 @@ class LoremResponseBody {
     }
 }
 
+class ProfileGenerator {
+    private randommerAdapter: RandommerAdapter;
+    private genderizeAdapter: GenderizeAdapter;
+    private diceBearAdapter: DiceBearAdapter;
+    private loremIpsumAdapter: LoremIpsumAdapter;
 
-let api = new RandommerAdapter();
-api.getRandomName().then(function(value) {
-    let diceBearAdapter = new DiceBearAdapter();
-    console.log(diceBearAdapter.getAvatarUrl(value));
-    let loremIpumAdapter = new LoremIpsumAdapter();
-    loremIpumAdapter.getText(value).then(function(value) {
-        console.log(value);
-    })
-})
+    constructor (randommerAdapter: RandommerAdapter, genderizeAdapter: GenderizeAdapter, diceBearAdapter: DiceBearAdapter, loremIpsumAdapter: LoremIpsumAdapter) {
+        this.randommerAdapter = randommerAdapter;
+        this.genderizeAdapter = genderizeAdapter;
+        this.diceBearAdapter = diceBearAdapter;
+        this.loremIpsumAdapter = loremIpsumAdapter;
+    }
 
-api.getRandomPhoneNumber().then(function(value) {
-    console.log(value);
-})
+    public generateProfile() : Promise<Profile> {
+        const self = this;
+        this.randommerAdapter.getRandomName().then(function(value) {
+            self.genderizeAdapter.getGender(value);
+            self.diceBearAdapter.getAvatarUrl(value);
+        })
+        this.randommerAdapter.getRandomPhoneNumber();
+        this.loremIpsumAdapter.getText();
+        let profile = new Profile()
+    }
+}
+
+class Profile {
+    public name: string;
+    public number: string;
+    public gender: string;
+    public avatar: string;
+    public text: string;
+
+    constructor (name: string, number: string, gender: string, avatar: string, text: string) {
+        this.name = name;
+        this.number = number;
+        this.gender = gender;
+        this.avatar = avatar;
+        this.text = text;
+    }
+}
+
+let adapter1 = new RandommerAdapter();
+let adapter2 = new GenderizeAdapter();
+let adapter3 = new DiceBearAdapter();
+let adapter4 = new LoremIpsumAdapter();
+
+let profile = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);

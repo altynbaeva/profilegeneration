@@ -1,5 +1,5 @@
 "use strict";
-class RandommerAdapted {
+class RandommerAdapter {
     baseUrl = "https://randommer.io/api";
     getRandomName() {
         let url = `${this.baseUrl}/Name?nameType=fullname&quantity=1`;
@@ -92,16 +92,23 @@ class LoremResponseBody {
         this.text = obj.text;
     }
 }
-let api = new RandommerAdapted();
-api.getRandomName().then(function (value) {
-    let diceBearAdapter = new DiceBearAdapter();
-    console.log(diceBearAdapter.getAvatarUrl(value));
-    let loremIpumAdapter = new LoremIpsumAdapter();
-    loremIpumAdapter.getText(value).then(function (value) {
-        console.log(value);
-    });
-});
-api.getRandomPhoneNumber().then(function (value) {
-    console.log(value);
-});
+let api = new RandommerAdapter();
+let a = api.getRandomName;
+console.log(a);
+class ProfileGenerator {
+    randommerAdapter;
+    genderizeAdapter;
+    diceBearAdapter;
+    loremIpsumAdapter;
+    constructor(randommerAdapter, genderizeAdapter, diceBearAdapter, loremIpsumAdapter) {
+        this.randommerAdapter = randommerAdapter;
+        this.genderizeAdapter = genderizeAdapter;
+        this.diceBearAdapter = diceBearAdapter;
+        this.loremIpsumAdapter = loremIpsumAdapter;
+    }
+    generateProfile() {
+        let name = this.randommerAdapter.getRandomName();
+        this.randommerAdapter.getRandomPhoneNumber();
+    }
+}
 //# sourceMappingURL=script.js.map
