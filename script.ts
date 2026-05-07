@@ -117,13 +117,32 @@ class ProfileGenerator {
 
     public generateProfile() : Promise<Profile> {
         const self = this;
-        this.randommerAdapter.getRandomName().then(function(value) {
-            self.genderizeAdapter.getGender(value);
-            self.diceBearAdapter.getAvatarUrl(value);
+        let map = new Map<string, string>();
+        return Promise.all([this.randommerAdapter.getRandomName(),
+                            this.randommerAdapter.getRandomPhoneNumber(),
+                            this.loremIpsumAdapter.getText()
+        ]).then(function(value) {
+            map.set("name", value[0]);
+            map.set("number", value[1]);
+            map.set("text", value[2])
+            return map;
         })
-        this.randommerAdapter.getRandomPhoneNumber();
-        this.loremIpsumAdapter.getText();
-        let profile = new Profile()
+        .then(function(value: Map<string, string>) {
+            let name: string;
+            if (value.has("name")) {
+                name = value.get("name")!;
+            }
+            return Promise.all([
+                self.genderizeAdapter.getGender(name!),
+                self.diceBearAdapter.getAvatarUrl(name!)
+            ])
+        })
+        .then(function(value) {
+            map.set("gender", value[0]);
+            map.set("avatar", value[1]);
+            let profile = new Profile(map.get("name")!, map.get("number")!, map.get("gender")!, map.get("avatar")!, map.get("text")!)
+            return profile;
+        })
     }
 }
 
@@ -149,3 +168,4 @@ let adapter3 = new DiceBearAdapter();
 let adapter4 = new LoremIpsumAdapter();
 
 let profile = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
+profile.generateProfile();

@@ -73,7 +73,7 @@ class DiceBearAdapter {
 }
 class LoremIpsumAdapter {
     baseUrl = "https://api.api-ninjas.com/v1/loremipsum";
-    getText(seed) {
+    getText() {
         return fetch(this.baseUrl, {
             headers: {
                 "X-Api-Key": "YbAFdWgbd1EHAepF2TSRcdUjV075pdVcGToX1EI7"
@@ -92,9 +92,6 @@ class LoremResponseBody {
         this.text = obj.text;
     }
 }
-let api = new RandommerAdapter();
-let a = api.getRandomName;
-console.log(a);
 class ProfileGenerator {
     randommerAdapter;
     genderizeAdapter;
@@ -107,8 +104,54 @@ class ProfileGenerator {
         this.loremIpsumAdapter = loremIpsumAdapter;
     }
     generateProfile() {
-        let name = this.randommerAdapter.getRandomName();
-        this.randommerAdapter.getRandomPhoneNumber();
+        const self = this;
+        let map = new Map();
+        return Promise.all([this.randommerAdapter.getRandomName(),
+            this.randommerAdapter.getRandomPhoneNumber(),
+            this.loremIpsumAdapter.getText()
+        ]).then(function (value) {
+            map.set("name", value[0]);
+            map.set("number", value[1]);
+            map.set("text", value[2]);
+            return map;
+        })
+            .then(function (value) {
+            let name;
+            if (value.has("name")) {
+                name = value.get("name");
+            }
+            return Promise.all([
+                self.genderizeAdapter.getGender(name),
+                self.diceBearAdapter.getAvatarUrl(name)
+            ]);
+        })
+            .then(function (value) {
+            map.set("gender", value[0]);
+            map.set("avatar", value[1]);
+            let profile = new Profile(map.get("name"), map.get("number"), map.get("gender"), map.get("avatar"), map.get("text"));
+            console.log(profile);
+            return profile;
+        });
     }
 }
+class Profile {
+    name;
+    number;
+    gender;
+    avatar;
+    text;
+    constructor(name, number, gender, avatar, text) {
+        this.name = name;
+        this.number = number;
+        this.gender = gender;
+        this.avatar = avatar;
+        this.text = text;
+    }
+}
+let adapter1 = new RandommerAdapter();
+let adapter2 = new GenderizeAdapter();
+let adapter3 = new DiceBearAdapter();
+let adapter4 = new LoremIpsumAdapter();
+let profile = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
+profile.generateProfile();
 //# sourceMappingURL=script.js.map
