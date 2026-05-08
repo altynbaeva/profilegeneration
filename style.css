@@ -1,0 +1,93 @@
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+    padding: 1rem;
+}
+
+.container {
+    background: #fffef7;
+    width: 100%;
+    max-width: 700px;
+    padding: 1.5rem;
+    border-radius: 2rem;
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+}
+
+#profile-screen {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.avatar-url {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.profile-info {
+    flex: 1;
+    background: #e6f9ed;
+    border-radius: 1.5rem;
+    padding: 1rem 1.2rem;
+}
+
+.profile-name {
+    margin-bottom: 0.5rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d5a4b;
+}
+
+.profile-number,
+.profile-gender,
+.profile-text {
+    margin: 0.4rem 0;
+    color: #2c5a4a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem
+}
+
+.profile-text {
+    background: #ffffffd9;
+    padding: 0.5rem 0.8rem;
+    border-radius: 1rem;
+    margin-top: 0.6rem;
+}
+
+#home-screen {
+    text-align: center;
+}
+
+#button-generate {
+    background: #ff8c5a;
+    border: none;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: 0.2s;
+}
+
+#button-generate:hover {
+    background: #e5733e;
+    transform: scale(1.02);
+}
+

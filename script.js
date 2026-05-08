@@ -68,6 +68,7 @@ class DiceBearAdapter {
     baseUrl = "https://api.dicebear.com/9.x/adventurer/svg?";
     getAvatarUrl(seed) {
         let url = `${this.baseUrl}seed=${seed}`;
+        console.log(url);
         return url;
     }
 }
@@ -129,7 +130,6 @@ class ProfileGenerator {
             map.set("gender", value[0]);
             map.set("avatar", value[1]);
             let profile = new Profile(map.get("name"), map.get("number"), map.get("gender"), map.get("avatar"), map.get("text"));
-            console.log(profile);
             return profile;
         });
     }

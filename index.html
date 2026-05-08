@@ -6,5 +6,21 @@
         <script src="script.js"></script>
         <link rel="stylesheet" href="style.css">
     </head>
-    <body></body>
+    <body>
+        <main class="container">
+            <div id="home-screen">
+                <h1>Генерация профиля</h1>
+                <button id="button-generate">Сгенерировать профиль</button>
+            </div>
+            <div id="profile-screen" hidden>
+                <img class="avatar-url" src="https://api.dicebear.com/9.x/adventurer/svg?seed=Akshara" alt="avatar-url" hidden>
+                <div class="profile-info">
+                    <h1 class="profile-name"></h1>
+                    <p class="profile-number"></p>
+                    <p class="profile-gender"></p>
+                    <p class="profile-text"></p>
+                </div>
+            </div>
+        </main>
+    </body>
 </html>
