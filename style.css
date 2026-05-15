@@ -1,38 +1,79 @@
-html {
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
 }
 
 body {
-    background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+    background: linear-gradient(135deg, #b8e1fc 0%, #d9b4ff 100%);
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100%;
-    padding: 1rem;
+    padding: 5px;
+    overflow: hidden;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .container {
     background: #fffef7;
-    width: 100%;
-    max-width: 700px;
-    padding: 1.5rem;
-    border-radius: 2rem;
-    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+    border-radius: max(2vmin, 12px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    padding: clamp(2vmin, 4vmin, 30px) clamp(1.5vmin, 3vmin, 25px);
+    width: min(85vmin, 650px);
+    max-width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+#home-screen h1 {
+    font-size: clamp(3.5vmin, 5.5vmin, 2.2rem);
+    color: #2d5a4b;
+    margin: 0 0 clamp(1.5vmin, 3vmin, 20px) 0;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+#button-generate {
+    background: #ff8c5a;
+    color: white;
+    border: none;
+    padding: clamp(1.2vmin, 2vmin, 12px) clamp(3vmin, 5vmin, 35px);
+    font-size: clamp(1.5vmin, 2.5vmin, 1rem);
+    border-radius: 60px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(255, 140, 90, 0.4);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    font-family: inherit;
+}
+
+#button-generate:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 140, 90, 0.5);
+    background: #e5733e;
+}
+
+#button-generate:active {
+    transform: translateY(0);
 }
 
 #profile-screen {
+    display: none;
+}
+
+#profile-screen.visible {
     display: flex;
-    gap: 1.5rem;
+    gap: clamp(1.5vmin, 3vmin, 25px);
     align-items: center;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .avatar-url {
+    width: clamp(18vmin, 22vmin, 130px);
+    height: clamp(18vmin, 22vmin, 130px);
     border-radius: 50%;
-    width: 120px;
-    height: 120px;
     object-fit: cover;
     border: 3px solid #fff;
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
@@ -41,53 +82,67 @@ body {
 
 .profile-info {
     flex: 1;
+    min-width: 160px;
     background: #e6f9ed;
-    border-radius: 1.5rem;
-    padding: 1rem 1.2rem;
+    border-radius: max(2vmin, 14px);
+    padding: clamp(1.2vmin, 2vmin, 14px) clamp(1.5vmin, 2.5vmin, 18px);
+    text-align: left;
+    font-family: inherit;
 }
 
 .profile-name {
-    margin-bottom: 0.5rem;
-    font-size: 1.6rem;
+    font-size: clamp(1.5vmin, 3.5vmin, 1.6rem);
     font-weight: 700;
+    margin-bottom: clamp(0.5vmin, 1vmin, 8px);
     color: #2d5a4b;
+    letter-spacing: -0.2px;
 }
 
 .profile-number,
 .profile-gender,
 .profile-text {
-    margin: 0.4rem 0;
+    margin: clamp(0.3vmin, 0.8vmin, 6px) 0;
     color: #2c5a4a;
     display: flex;
     align-items: center;
-    gap: 0.5rem
+    gap: 0.5rem;
+    font-size: clamp(1vmin, 2vmin, 0.95rem);
+    flex-wrap: wrap;
+    font-weight: 450;
 }
 
 .profile-text {
     background: #ffffffd9;
-    padding: 0.5rem 0.8rem;
-    border-radius: 1rem;
-    margin-top: 0.6rem;
+    padding: clamp(0.4vmin, 0.8vmin, 6px) clamp(0.8vmin, 1.2vmin, 10px);
+    border-radius: max(1.5vmin, 12px);
+    margin-top: clamp(0.3vmin, 0.6vmin, 5px);
+    line-height: 1.4;
 }
 
-#home-screen {
-    text-align: center;
+@media (max-width: 550px) {
+    #profile-screen {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-info {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .profile-number,
+    .profile-gender,
+    .profile-text {
+        justify-content: center;
+    }
 }
 
-#button-generate {
-    background: #ff8c5a;
-    border: none;
-    color: white;
-    padding: 0.7rem 1.5rem;
-    border-radius: 2rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: 0.2s;
+@media (max-height: 550px) {
+    .container {
+        padding: 12px 18px;
+    }
+    
+    .profile-text {
+        line-height: 1.3;
+    }
 }
-
-#button-generate:hover {
-    background: #e5733e;
-    transform: scale(1.02);
-}
-
