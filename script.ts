@@ -175,8 +175,8 @@ function buildProfile() {
     let adapter3 = new DiceBearAdapter();
     let adapter4 = new LoremIpsumAdapter();
 
-    let profileg = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
-    let a = profileg.generateProfile().then(function(value) {
+    let profileGenerator = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
+    profileGenerator.generateProfile().then(function(value) {
         hiddenChange();
         drawProfile(value);
     })
