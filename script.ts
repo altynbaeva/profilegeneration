@@ -117,30 +117,30 @@ class ProfileGenerator {
 
     public generateProfile() : Promise<Profile> {
         const self = this;
-        let map = new Map<string, string>();
+        let name: string;
+        let number: string;
+        let text: string;
+        let gender: string;
+        let avatar: string;
         return Promise.all([this.randommerAdapter.getRandomName(),
                             this.randommerAdapter.getRandomPhoneNumber(),
                             this.loremIpsumAdapter.getText()
         ]).then(function(value) {
-            map.set("name", value[0]);
-            map.set("number", value[1]);
-            map.set("text", value[2])
-            return map;
+            name = value[0];
+            number = value[1];
+            text = value[2];
+            return name;
         })
-        .then(function(value: Map<string, string>) {
-            let name: string;
-            if (value.has("name")) {
-                name = value.get("name")!;
-            }
+        .then(function(value) {
             return Promise.all([
-                self.genderizeAdapter.getGender(name!),
-                self.diceBearAdapter.getAvatarUrl(name!)
+                self.genderizeAdapter.getGender(value),
+                self.diceBearAdapter.getAvatarUrl(value)
             ])
         })
         .then(function(value) {
-            map.set("gender", value[0]);
-            map.set("avatar", value[1]);
-            let profile = new Profile(map.get("name")!, map.get("number")!, map.get("gender")!, map.get("avatar")!, map.get("text")!)
+            gender = value[0];
+            avatar = value[1];
+            let profile = new Profile(name, number, gender, avatar, text);
             return profile;
         })
     }
@@ -162,10 +162,63 @@ class Profile {
     }
 }
 
-let adapter1 = new RandommerAdapter();
-let adapter2 = new GenderizeAdapter();
-let adapter3 = new DiceBearAdapter();
-let adapter4 = new LoremIpsumAdapter();
+window.onload = function () {
+    const buttonGenerate = document.getElementById("button-generate");
+    if (buttonGenerate) {
+        buttonGenerate.onclick = buildProfile;
+    }
+}
 
-let profile = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
-profile.generateProfile();
+function buildProfile() {
+    let adapter1 = new RandommerAdapter();
+    let adapter2 = new GenderizeAdapter();
+    let adapter3 = new DiceBearAdapter();
+    let adapter4 = new LoremIpsumAdapter();
+
+    let profileg = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
+    let a = profileg.generateProfile().then(function(value) {
+        hiddenChange();
+        drawProfile(value);
+    })
+}
+
+function hiddenChange () {
+    const homeScreen = document.getElementById("home-screen");
+    const profileScreen = document.getElementById("profile-screen");
+    if (profileScreen) {
+        profileScreen.classList.add("visible");
+        profileScreen.hidden = false;
+    }
+    if (homeScreen) {
+        homeScreen.hidden = true;
+    }
+}
+
+function drawProfile (profile: Profile) {
+    const imageElement = document.createElement("img");
+    imageElement.className = "avatar-url";
+    let profileScreen = document.getElementById("profile-screen");
+    profileScreen?.append(imageElement);
+    imageElement.alt = "avatar-url";
+    imageElement.src = profile.avatar;
+
+    const nameElement = document.querySelector(".profile-name");
+    if (nameElement) {
+        nameElement.textContent = `${profile.name}`;
+    }
+
+    const numberElement = document.querySelector(".profile-number");
+    if (numberElement) {
+        numberElement.textContent = `${profile.number}`;
+    }
+
+    const genderElement = document.querySelector(".profile-gender");
+    if (genderElement) {
+        genderElement.textContent = `${profile.gender}`;
+    }
+
+    const textElement = document.querySelector(".profile-text");
+    if (textElement) {
+        textElement.textContent = `${profile.text}`;
+    }
+}
