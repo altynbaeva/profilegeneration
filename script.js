@@ -1,61 +1,53 @@
 "use strict";
 class RandommerAdapter {
     baseUrl = "https://randommer.io/api";
-    getRandomName() {
-        let url = `${this.baseUrl}/Name?nameType=fullname&quantity=1`;
-        return fetch(url, {
+    async getRandomName() {
+        const url = `${this.baseUrl}/Name?nameType=fullname&quantity=1`;
+        const response = await fetch(url, {
             headers: {
                 "X-Api-Key": "568b267ac7eb4b26a718ff57f517fb26"
             }
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            if (!Array.isArray(json)) {
-                throw new Error("failed to parse /Name response, is not array: " + JSON.stringify(json));
-            }
-            if (json.length == 0) {
-                throw new Error("failed to parse /Name response, array len is 0: " + JSON.stringify(json));
-            }
-            let name = json[0];
-            if (typeof name !== "string") {
-                throw new Error("failed to parse /Name response, first elem is not string: " + JSON.stringify(json));
-            }
-            return name;
         });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const json = await response.json();
+        if (!Array.isArray(json))
+            throw new Error("Не массив");
+        if (json.length === 0)
+            throw new Error("Пустой массив");
+        if (typeof json[0] !== 'string')
+            throw new Error("Не строка");
+        return json[0];
     }
-    getRandomPhoneNumber() {
-        let url = `${this.baseUrl}/Phone/Generate?CountryCode=ru&Quantity=1`;
-        return fetch(url, {
+    async getRandomPhoneNumber() {
+        const url = `${this.baseUrl}/Phone/Generate?CountryCode=ru&Quantity=1`;
+        const response = await fetch(url, {
             headers: {
                 "X-Api-Key": "568b267ac7eb4b26a718ff57f517fb26"
             }
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            if (!Array.isArray(json)) {
-                throw new Error("failed to parse /Number response, is not array: " + JSON.stringify(json));
-            }
-            if (json.length == 0) {
-                throw new Error("failed to parse /Number response, array len is 0: " + JSON.stringify(json));
-            }
-            let number = json[0];
-            if (typeof number !== "string") {
-                throw new Error("failed to parse /Number response, first elem is not string: " + JSON.stringify(json));
-            }
-            return number;
         });
+        const json = await response.json();
+        if (!Array.isArray(json))
+            throw new Error("Не массив");
+        if (json.length === 0)
+            throw new Error("Пустой массив");
+        if (typeof json[0] !== 'string')
+            throw new Error("Не строка");
+        return json[0];
     }
 }
 class GenderizeAdapter {
     baseUrl = "https://api.genderize.io?";
-    getGender(name) {
-        let url = `${this.baseUrl}name=${name}`;
-        return fetch(url).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            const resp = new GenderizeResponseBody(json);
-            return resp.gender;
-        });
+    async getGender(name) {
+        const url = `${this.baseUrl}name=${name}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const json = await response.json();
+        const resp = new GenderizeResponseBody(json);
+        return resp.gender;
     }
 }
 class GenderizeResponseBody {
@@ -73,17 +65,18 @@ class DiceBearAdapter {
 }
 class LoremIpsumAdapter {
     baseUrl = "https://api.api-ninjas.com/v1/loremipsum";
-    getText() {
-        return fetch(this.baseUrl, {
+    async getText() {
+        const response = await fetch(this.baseUrl, {
             headers: {
                 "X-Api-Key": "YbAFdWgbd1EHAepF2TSRcdUjV075pdVcGToX1EI7"
             }
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            const resp = new LoremResponseBody(json);
-            return resp.text;
         });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const json = await response.json();
+        const resp = new LoremResponseBody(json);
+        return resp.text;
     }
 }
 class LoremResponseBody {
