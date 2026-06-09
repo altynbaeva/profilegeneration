@@ -29,7 +29,11 @@ class RandommerAdapter {
                 "X-Api-Key": "568b267ac7eb4b26a718ff57f517fb26"
             }
         })
-        
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
         const json = await response.json();
 
         if (!Array.isArray(json)) throw new Error("Не массив");
@@ -51,19 +55,18 @@ class GenderizeAdapter {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
     
-        const json = await response.json();
-        const resp = new GenderizeResponseBody(json);
-    
-        return resp.gender;
+        const json = await response.json() as GenderizeResponse;
+        if (typeof json !== 'object' || json === null || typeof json.gender !== 'string') {
+            throw new Error('Invalid Genderize response');
+        }
+        return json.gender;
 
     }
 }
 
-class GenderizeResponseBody {
-    public gender: string;
-    constructor (obj: any) {
-        this.gender = obj.gender
-    }
+
+interface GenderizeResponse {
+    gender: string;
 }
 
 class DiceBearAdapter {
@@ -89,62 +92,37 @@ class LoremIpsumAdapter {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        const json = await response.json();
-        const resp = new LoremResponseBody(json);
-        
-        return resp.text;
+        const json = await response.json() as LoremResponse;
+        if (typeof json !== 'object' || json === null || typeof json.text !== 'string') {
+            throw new Error('Invalid Lorem response');
+        }
+        return json.text;
         
     }
 }
 
-class LoremResponseBody {
-    public text: string;
-    constructor (obj: any) {
-        this.text = obj.text;
-    }
+interface LoremResponse {
+    text: string;
 }
 
 class ProfileGenerator {
-    private randommerAdapter: RandommerAdapter;
-    private genderizeAdapter: GenderizeAdapter;
-    private diceBearAdapter: DiceBearAdapter;
-    private loremIpsumAdapter: LoremIpsumAdapter;
+    constructor(
+        private randommerAdapter: RandommerAdapter,
+        private genderizeAdapter: GenderizeAdapter,
+        private diceBearAdapter: DiceBearAdapter,
+        private loremIpsumAdapter: LoremIpsumAdapter
+    ) {}
 
-    constructor (randommerAdapter: RandommerAdapter, genderizeAdapter: GenderizeAdapter, diceBearAdapter: DiceBearAdapter, loremIpsumAdapter: LoremIpsumAdapter) {
-        this.randommerAdapter = randommerAdapter;
-        this.genderizeAdapter = genderizeAdapter;
-        this.diceBearAdapter = diceBearAdapter;
-        this.loremIpsumAdapter = loremIpsumAdapter;
-    }
+    public async generateProfile() : Promise<Profile> {
+        const [name, number, text] = await Promise.all([
+                                this.randommerAdapter.getRandomName(),
+                                this.randommerAdapter.getRandomPhoneNumber(),
+                                this.loremIpsumAdapter.getText()]);
 
-    public generateProfile() : Promise<Profile> {
-        const self = this;
-        let name: string;
-        let number: string;
-        let text: string;
-        let gender: string;
-        let avatar: string;
-        return Promise.all([this.randommerAdapter.getRandomName(),
-                            this.randommerAdapter.getRandomPhoneNumber(),
-                            this.loremIpsumAdapter.getText()
-        ]).then(function(value) {
-            name = value[0];
-            number = value[1];
-            text = value[2];
-            return name;
-        })
-        .then(function(value) {
-            return Promise.all([
-                self.genderizeAdapter.getGender(value),
-                self.diceBearAdapter.getAvatarUrl(value)
-            ])
-        })
-        .then(function(value) {
-            gender = value[0];
-            avatar = value[1];
-            let profile = new Profile(name, number, gender, avatar, text);
-            return profile;
-        })
+        const avatarUrl = this.diceBearAdapter.getAvatarUrl(name);
+        const gender = await this.genderizeAdapter.getGender(name);
+        
+        return new Profile(name, number, gender, avatarUrl, text);
     }
 }
 
@@ -171,20 +149,26 @@ window.onload = function () {
     }
 }
 
-function buildProfile() {
-    let adapter1 = new RandommerAdapter();
-    let adapter2 = new GenderizeAdapter();
-    let adapter3 = new DiceBearAdapter();
-    let adapter4 = new LoremIpsumAdapter();
+async function buildProfile() {
+    try {
+        const randommerAdapter = new RandommerAdapter();
+        const genderizeAdapter = new GenderizeAdapter();
+        const diceBearAdapter = new DiceBearAdapter();
+        const loremIpsumAdapter = new LoremIpsumAdapter();
 
-    let profileGenerator = new ProfileGenerator(adapter1, adapter2, adapter3, adapter4);
-    profileGenerator.generateProfile().then(function(value) {
-        hiddenChange();
-        drawProfile(value);
-    })
+        const profileGenerator = new ProfileGenerator(randommerAdapter, genderizeAdapter, diceBearAdapter, loremIpsumAdapter);
+        const profile = await profileGenerator.generateProfile();
+
+        switchToProfileScreen();
+        drawProfile(profile);
+    } catch (error) {
+        console.error('Ошибка при создании профиля:', error);
+        alert('Не удалось создать профиль. Попробуйте позже.');
+    }
+    
 }
 
-function hiddenChange () {
+function switchToProfileScreen () {
     const homeScreen = document.getElementById("home-screen");
     const profileScreen = document.getElementById("profile-screen");
     if (profileScreen) {
@@ -197,29 +181,36 @@ function hiddenChange () {
 }
 
 function drawProfile (profile: Profile) {
+    let profileScreen = document.getElementById("profile-screen");
+    if (!profileScreen) {
+        return
+    }
+    const oldImage = profileScreen?.querySelector(".avatar-url");
+    if (oldImage) {
+        oldImage.remove();
+    }
     const imageElement = document.createElement("img");
     imageElement.className = "avatar-url";
-    let profileScreen = document.getElementById("profile-screen");
     profileScreen?.append(imageElement);
     imageElement.alt = "avatar-url";
     imageElement.src = profile.avatar;
 
-    const nameElement = document.querySelector(".profile-name");
+    const nameElement = document.getElementById("profile-name");
     if (nameElement) {
         nameElement.textContent = `${profile.name}`;
     }
 
-    const numberElement = document.querySelector(".profile-number");
+    const numberElement = document.getElementById("profile-number");
     if (numberElement) {
         numberElement.textContent = `${profile.number}`;
     }
 
-    const genderElement = document.querySelector(".profile-gender");
+    const genderElement = document.getElementById("profile-gender");
     if (genderElement) {
         genderElement.textContent = `${profile.gender}`;
     }
 
-    const textElement = document.querySelector(".profile-text");
+    const textElement = document.getElementById("profile-text");
     if (textElement) {
         textElement.textContent = `${profile.text}`;
     }
