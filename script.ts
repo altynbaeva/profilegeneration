@@ -1,6 +1,13 @@
 class RandommerAdapter {
     private baseUrl = "https://randommer.io/api"
 
+    private validateArrayResponse(json: unknown): string {
+        if (!Array.isArray(json)) throw new Error("Не массив");
+        if (json.length === 0) throw new Error("Пустой массив");
+        if (typeof json[0] !== 'string') throw new Error("Не строка");
+        return json[0];
+    }
+
     public async getRandomName(): Promise<string> {
         const url = `${this.baseUrl}/Name?nameType=fullname&quantity=1`;
         const response = await fetch(url, {
@@ -14,10 +21,7 @@ class RandommerAdapter {
         }
 
         const json = await response.json();
-        
-        if (!Array.isArray(json)) throw new Error("Не массив");
-        if (json.length === 0) throw new Error("Пустой массив");
-        if (typeof json[0] !== 'string') throw new Error("Не строка");
+        this.validateArrayResponse(json);
         
         return json[0];
     }
@@ -35,11 +39,8 @@ class RandommerAdapter {
         }
 
         const json = await response.json();
+        this.validateArrayResponse(json);
 
-        if (!Array.isArray(json)) throw new Error("Не массив");
-        if (json.length === 0) throw new Error("Пустой массив");
-        if (typeof json[0] !== 'string') throw new Error("Не строка");
-        
         return json[0];
     }
 }
@@ -121,7 +122,7 @@ class ProfileGenerator {
 
         const avatarUrl = this.diceBearAdapter.getAvatarUrl(name);
         const gender = await this.genderizeAdapter.getGender(name);
-        
+
         return new Profile(name, number, gender, avatarUrl, text);
     }
 }
@@ -173,10 +174,9 @@ function switchToProfileScreen () {
     const profileScreen = document.getElementById("profile-screen");
     if (profileScreen) {
         profileScreen.classList.add("visible");
-        profileScreen.hidden = false;
     }
     if (homeScreen) {
-        homeScreen.hidden = true;
+        homeScreen.classList.add("hidden");
     }
 }
 
@@ -191,27 +191,27 @@ function drawProfile (profile: Profile) {
     }
     const imageElement = document.createElement("img");
     imageElement.className = "avatar-url";
-    profileScreen?.append(imageElement);
+    profileScreen.append(imageElement);
     imageElement.alt = "avatar-url";
     imageElement.src = profile.avatar;
 
     const nameElement = document.getElementById("profile-name");
     if (nameElement) {
-        nameElement.textContent = `${profile.name}`;
+        nameElement.textContent = profile.name;
     }
 
     const numberElement = document.getElementById("profile-number");
     if (numberElement) {
-        numberElement.textContent = `${profile.number}`;
+        numberElement.textContent = profile.number;
     }
 
     const genderElement = document.getElementById("profile-gender");
     if (genderElement) {
-        genderElement.textContent = `${profile.gender}`;
+        genderElement.textContent = profile.gender;
     }
 
     const textElement = document.getElementById("profile-text");
     if (textElement) {
-        textElement.textContent = `${profile.text}`;
+        textElement.textContent = profile.text;
     }
 }
